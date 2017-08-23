@@ -1,0 +1,121 @@
+{% extends "layout.html" %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='first.css') }}">
+{% block body %}
+    <div>
+        <aside style="float: left; height:45; width:800">
+            <nav style="float: left; height:45; width:800">
+                <ul style="list-style:none; height:45px">
+                    <li style="float:left; width:150px; height:42px; text-align:center"><a style="text-decoration:none" href="{{url_for('first')}}">首页</a></li>
+                    <li style="float:left; width:150px; height:42px; text-align:center"><a style="text-decoration:none" href="{{url_for('algorithmHIS')}}">HIS</a></li>
+                    <li style="float:left; width:150px; height:42px; text-align:center"><a style="text-decoration:none" href="{{url_for('algorithmICC')}}">ICC</a></li>
+                    <li style="float:left; width:150px; height:42px; text-align:center"><a style="text-decoration:none" href="{{url_for('algorithmBICC')}}">BICC</a></li>
+                    <li style="float:left; width:150px; height:42px; text-align:center"><a style="text-decoration:none" href="{{url_for('algorithmWX')}}">HIS_BICC</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <article>
+            <section>
+                <fieldset>
+                    <legend>关于本页面</legend>
+                    本页面展示了节点之间的关系，我们对节点进行了社团划分。
+                </fieldset>
+            </section>
+            <div style="background: #ffffff">
+                <svg></svg>
+            </div>
+        </article>
+        <footer style="text-align:center">欢迎光临！</footer>
+    </div>
+    <style>
+        .links line {
+          stroke: #999;
+          stroke-opacity: 0.6;
+        }
+        .nodes circle {
+          stroke: #fff;
+          stroke-width: 1.5px;
+        }
+        article{
+            margin-left: 10em;
+        }
+        svg{
+            width: 40em;
+            height: 40em;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script>
+        var svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height");
+
+        var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+        var simulation = d3.forceSimulation()
+            .force("link", d3.forceLink().id(function(d) { return d.id; }))
+            .force("charge", d3.forceManyBody())
+            .force("center", d3.forceCenter(width / 2, height / 2));
+
+        d3.json("./static/force/community_Picture.json", function(error, graph) {
+          if (error) throw error;
+
+          var link = svg.append("g")
+              .attr("class", "links")
+              .selectAll("line")
+              .data(graph.links)
+              .enter().append("line")
+              .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+          var node = svg.append("g")
+              .attr("class", "nodes")
+              .selectAll("circle")
+              .data(graph.nodes)
+              .enter().append("circle")
+              .attr("r", 5)
+              .attr("fill", function(d) { return color(d.group); })
+              .call(d3.drag()
+                      .on("start", dragstarted)
+                      .on("drag", dragged)
+                      .on("end", dragended));
+
+          node.append("title")
+              .text(function(d) { return d.id; });
+
+          simulation
+              .nodes(graph.nodes)
+              .on("tick", ticked);
+
+          simulation.force("link")
+              .links(graph.links);
+
+          function ticked() {
+            link
+                .attr("x1", function(d) { return 310 + d.source.x; })
+                .attr("y1", function(d) { return 290 + d.source.y; })
+                .attr("x2", function(d) { return 310 + d.target.x; })
+                .attr("y2", function(d) { return 290 + d.target.y; });
+
+            node
+                .attr("cx", function(d) { return 310 + d.x; })
+                .attr("cy", function(d) { return 290 + d.y; });
+          }
+        });
+
+        function dragstarted(d) {
+          if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+          d.fx = d.x;
+          d.fy = d.y;
+        }
+
+        function dragged(d) {
+          d.fx = d3.event.x;
+          d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+          if (!d3.event.active) simulation.alphaTarget(0);
+          d.fx = null;
+          d.fy = null;
+        }
+    </script>
+{% endblock%}

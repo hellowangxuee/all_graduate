@@ -1,0 +1,16 @@
+数据化运营网站最终对数据进行了展示分析，有利于运营人员分析数据
+
+
+1、cmd 命令行进入flaskr文件夹
+2、运行 python flaskr.py
+3、等待服务运行起来，显示如下：
+C:\Users\miao\Desktop\all_graduate\flaskr>python flaskr.py
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger pin code: 236-009-856
+ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+打开浏览器，http://127.0.0.1:5000/first，即可看到运行结果
+
+
+注：flaskr文件夹是基于python的框架构建的一个小网站，
+    graduate文件夹是关于对twitter数据做的分析处理。
